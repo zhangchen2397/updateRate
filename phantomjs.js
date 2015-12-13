@@ -7,21 +7,26 @@ var WEB_URL_MAP = {
     sina: 'http://sina.cn',
     sohu: 'http://m.sohu.com/?v=3&amp;_once_=sohu_version_3&amp;_smuid=FvsOWg2jhdCXP9sr2GgLja'
 };
+var REPORT_URL = 'http://localhost:3000/report/add';
 
 function getQQListData() {
     console.log('open qq web');
     page = require( 'webpage' ).create();
 
     page.onConsoleMessage = function(msg) {
-        console.log(msg);
+        //console.log(msg);
     };
+
+    page.onError = function(msg, trace) {
+        //console.error(msg);
+    }
 
     page.open(WEB_URL_MAP['qq'], function(status) {
         page.includeJs(JQ_URL, function() {
-            var rst = page.evaluate(function() {
+            var rst = page.evaluate(function(reportUrl) {
                 function getWebData() {
                     var rst = {
-                        webName: 'qq',
+                        webName: '手机腾讯网',
                         list: []
                     };
 
@@ -57,14 +62,40 @@ function getQQListData() {
                     return rst;
                 }
 
-                return getWebData();
-            });
+                //上报抓取数据
+                var rst = getWebData();
+                $.each(rst.list, function(index, value) {
+                    $.ajax({
+                        url: reportUrl,
+                        data: {
+                            content: value.content.join('@'),
+                            web: rst.webName,
+                            category: value.cateName
+                        }
+                    }).done(function(data) {
+                        console.log(JSON.stringify(data));
+                    }).fail(function(data) {
+                        console.log(JSON.stringify(data));
+                    });
+                });
+
+                return rst;
+            }, REPORT_URL);
 
             RESULT.push(rst);
 
             console.log('spider qq web success');
 
-            page.close();
+            var server = require('webserver').create();
+            server.listen(8080, function(request, response) {
+                response.statusCode = 200;
+                response.write('<html><body>' + JSON.stringify(RESULT) + '</body></html>');
+                response.close();
+            });
+
+            setTimeout(function() {
+                page.close();
+            }, 500);
         });
     });
 
@@ -80,15 +111,19 @@ function getSohuListData() {
     page = require( 'webpage' ).create();
 
     page.onConsoleMessage = function(msg) {
-        console.log(msg);
+        //console.log(msg);
     };
+
+    page.onError = function(msg, trace) {
+        //console.error(msg);
+    }
 
     page.open(WEB_URL_MAP['sohu'], function(status) {
         page.includeJs(JQ_URL, function() {
-            var rst = page.evaluate(function() {
+            var rst = page.evaluate(function(reportUrl) {
                 function getWebData() {
                     var rst = {
-                        webName: 'sohu',
+                        webName: '手机搜狐网',
                         list: []
                     };
 
@@ -109,7 +144,7 @@ function getSohuListData() {
                             content: []
                         };
 
-                        var listEl = $('.' + value.className).parent('.cnl').find('.it');
+                        var listEl = $('.' + value.className).parent('.cnl').find('.ls>.it');
 
                         $.each(listEl, function(subIdx, subVal) {
                             var curItem = $(subVal);
@@ -124,14 +159,40 @@ function getSohuListData() {
                     return rst;
                 }
 
-                return getWebData();
-            });
+                //上报抓取数据
+                var rst = getWebData();
+                $.each(rst.list, function(index, value) {
+                    $.ajax({
+                        url: reportUrl,
+                        data: {
+                            content: value.content.join('@'),
+                            web: rst.webName,
+                            category: value.cateName
+                        }
+                    }).done(function(data) {
+                        console.log(JSON.stringify(data));
+                    }).fail(function(data) {
+                        console.log(JSON.stringify(data));
+                    });
+                });
+
+                return rst;
+            }, REPORT_URL);
 
             RESULT.push(rst);
 
             console.log('spider sohu web success');
 
-            page.close();
+            var server = require('webserver').create();
+            server.listen(8080, function(request, response) {
+                response.statusCode = 200;
+                response.write('<html><body>' + JSON.stringify(RESULT) + '</body></html>');
+                response.close();
+            });
+
+            setTimeout(function() {
+                page.close();
+            }, 1000);
         });
     });
 
@@ -156,10 +217,10 @@ function getSinaListData() {
 
     page.open(WEB_URL_MAP['sina'], function(status) {
         page.includeJs(JQ_URL, function() {
-            var rst = page.evaluate(function() {
+            var rst = page.evaluate(function(reportUrl) {
                 function getWebData() {
                     var rst = {
-                        webName: 'sina',
+                        webName: '手机新浪网',
                         list: []
                     };
 
@@ -222,14 +283,40 @@ function getSinaListData() {
                     return rst;
                 }
 
-                return getWebData();
-            });
+                //上报抓取数据
+                var rst = getWebData();
+                $.each(rst.list, function(index, value) {
+                    $.ajax({
+                        url: reportUrl,
+                        data: {
+                            content: value.content.join('@'),
+                            web: rst.webName,
+                            category: value.cateName
+                        }
+                    }).done(function(data) {
+                        console.log(JSON.stringify(data));
+                    }).fail(function(data) {
+                        console.log(JSON.stringify(data));
+                    });
+                });
+
+                return rst;
+            }, REPORT_URL);
 
             RESULT.push(rst);
 
             console.log('spider sina web success');
 
-            page.close();
+            var server = require('webserver').create();
+            server.listen(8080, function(request, response) {
+                response.statusCode = 200;
+                response.write('<html><body>' + JSON.stringify(RESULT) + '</body></html>');
+                response.close();
+            });
+
+            setTimeout(function() {
+                page.close();
+            }, 500);
         });
     });
 
@@ -242,7 +329,8 @@ function getSinaListData() {
 //调用
 var COUNT = 1;
 var RESULT = [];
-setInterval(function() {
+
+function initRun() {
     console.log(new Date());
     console.log(COUNT++);
     RESULT = [];
@@ -254,4 +342,17 @@ setInterval(function() {
         response.write('<html><body>' + JSON.stringify(RESULT) + '</body></html>');
         response.close();
     });
-}, 20 * 1000);
+}
+
+function intervalRun() {
+    setInterval(function() {
+        initRun();
+    }, 2 * 60 * 1000);
+}
+
+function run() {
+    initRun();
+    intervalRun();
+}
+
+run();
