@@ -1,11 +1,7 @@
 var mysql = require('mysql');
 var _ = require('underscore');
 var conf = require('../conf/db');
-var sql = require('./reportSqlMap');
 var moment = require('moment');
-
-var WEB_ARR = ['手机腾讯网', '手机新浪网', '手机搜狐网'];
-var CATEGORY_ARR = ['要闻', '财经', '娱乐', '体育']
  
 var pool  = mysql.createPool(_.extend({}, conf.mysql));
  
@@ -54,37 +50,6 @@ function actionDayAnalyze(data) {
         });
     });
 }
-
-function dayAnalyze() {
-    _.each(WEB_ARR, function(val, idx) {
-        _.each(CATEGORY_ARR, function(cateVal, cateIdx) {
-            var query = [
-                'select * from report where web=? and category=? and ',
-                'unix_timestamp(createTime) > unix_timestamp(current_date()) and unix_timestamp(createTime) < (unix_timestamp(current_date()) + 86400)',
-            ].join('');
-
-            pool.getConnection(function(err, connection) {
-                connection.query(query, function(err, result) {
-                    if (err) console.log(err);
-
-                    _.each(result, function(val) {
-                        val.createTime = moment(val.createTime).format('YYYY-MM-DD HH:mm:ss');
-                        val.timestamp = +new Date(val.createTime);
-                    });
-
-                    actionDayAnalyze(result);
-
-                    res.render('analyze', {
-                        result: result
-                    });
-                    connection.release();
-                });
-            });
-        });
-    });
-}
-
-
  
 module.exports = {
     add: function (req, res, next) {

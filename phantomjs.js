@@ -34,11 +34,14 @@ function getQQListData() {
                         id: 'lincoapp-home-jryw',
                         name: '要闻'
                     }, {
-                        id: 'lincoapp-home-sports',
-                        name: '体育'
+                        id: 'lincoapp-home-finance',
+                        name: '财经'
                     }, {
                         id: 'lincoapp-home-ent',
                         name: '娱乐'
+                    }, {
+                        id: 'lincoapp-home-sports',
+                        name: '体育'
                     }];
 
                     $.each(cateArr, function(index, value) {
@@ -136,6 +139,9 @@ function getSohuListData() {
                     }, {
                         className: 'adISEntertainments',
                         name: '娱乐'
+                    }, {
+                        className: 'adISSports',
+                        name: '体育'
                     }];
 
                     $.each(cateArr, function(index, value) {
@@ -242,14 +248,14 @@ function getSinaListData() {
                     })();
 
                     var cateArr = [{
-                        id: 'sports',
-                        name: '体育'
+                        id: 'finance',
+                        name: '财经'
                     }, {
                         id: 'ent',
                         name: '娱乐'
                     }, {
-                        id: 'finance',
-                        name: '财经'
+                        id: 'sports',
+                        name: '体育'
                     }];
 
                     $.each(cateArr, function(index, value) {
