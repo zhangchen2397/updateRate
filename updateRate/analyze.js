@@ -1,6 +1,6 @@
 var mysql = require('mysql');
 var _ = require('underscore');
-var conf = require('../conf/db');
+var conf = require('./app/conf/db');
 var moment = require('moment');
 
 var WEB_ARR = ['手机腾讯网', '手机新浪网', '手机搜狐网'];
@@ -34,7 +34,7 @@ function dayAnalyze(date) {
     });
 }
 
-function calUpdate(data, web, category, date, parentCnct) {
+function calUpdate(data, web, category, date) {
     var updateCount = 0;
     _.each(data, function(val, idx) {
         if (data.length - 1 == idx) return;
@@ -48,7 +48,7 @@ function calUpdate(data, web, category, date, parentCnct) {
                 var query = 'select * from update_record where web=? and category=? and updateTime=?'
                 connection.query(query, [web, category, nextItem.createTime], function(err, result) {
                     if (!result.length) {
-                        var query = 'INSERT INTO update_record(updateTime, web, category, content) VALUES(?, ?, ?, ?)';
+                        var query = 'insert into update_record(updateTime, web, category, content) values(?, ?, ?, ?)';
                         connection.query(query, [nextItem.createTime, web, category, curCon + "##" + nextCon], function(err, result) {
                             connection.release();
                         });
@@ -58,13 +58,16 @@ function calUpdate(data, web, category, date, parentCnct) {
         }
     });
 
+    console.log(web + '-' + category + ' update count: ' + updateCount);
+
     if (!updateCount) return;
     pool.getConnection(function(err, connection) {
         var query = 'select * from day_analyze where web=? and category=? and date=?';
         connection.query(query, [web, category, date], function(err, result) {
             if (!result.length) {
-                var query = 'INSERT INTO day_analyze(date, updateCount, web, category) VALUES(?, ?, ?, ?)';
+                var query = 'insert into day_analyze(date, updateCount, web, category) values(?, ?, ?, ?)';
                 connection.query(query, [date, updateCount, web, category], function(err, result) {
+                    console.log('analyze done');
                     connection.release();
                 });
             }
@@ -72,36 +75,6 @@ function calUpdate(data, web, category, date, parentCnct) {
     });
 }
 
-//dayAnalyze();
-
-module.exports = {
-    add: function (req, res, next) {
-        res.header("Access-Control-Allow-Origin", "*");
-        pool.getConnection(function(err, connection) {
-            // 获取前台页面传过来的参数
-            var param = req.query || req.params;
-            var queryParam = [param.content, param.web, param.category]; 
-            var query = 'INSERT INTO report(content, web, category) VALUES(?,?,?)';
-            
-            connection.query(query, queryParam, function(err, result) {
-                if(result) {
-                    result = {
-                        code: 200,
-                        msg: '增加成功'
-                    };
-                }
-
-                if(typeof result === 'undefined') {
-                    res.json({
-                        code:'1',
-                        msg: '操作失败'
-                    });
-                } else {
-                    res.json(result);
-                }
- 
-                connection.release();
-            });
-        });
-    }
-};
+dayAnalyze();
+//dayAnalyze('2015-12-14');
+//dayAnalyze('2015-12-13');
