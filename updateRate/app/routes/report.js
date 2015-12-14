@@ -10,8 +10,4 @@ router.get('/add', function(req, res, next) {
     reportDao.add(req, res, next);
 });
 
-router.get('/analyze', function(req, res, next) {
-    reportDao.analyze(req, res, next);
-});
-
 module.exports = router;

@@ -21,7 +21,33 @@ var jsonWrite = function (res, ret) {
     }
 };
 
-function actionDayAnalyze(data) {
+// date '2015-12-15'
+function dayAnalyze(date) {
+    var compareDate = (+new Date(moment(new Date()).format('YYYY-MM-DD'))) / 1000;
+    if (date) {
+        compareDate = (+ new Date(date)) / 1000;
+    }
+
+    _.each(WEB_ARR, function(val, idx) {
+        _.each(CATEGORY_ARR, function(cateVal, cateIdx) {
+            var query = [
+                'select * from report where web=? and category=? and ',
+                'unix_timestamp(createTime) > ? and unix_timestamp(createTime) < (? + 86400)'
+            ].join('');
+
+            pool.getConnection(function(err, connection) {
+                connection.query(query, [val, cateVal, compareDate, compareDate], function(err, result) {
+                    if (err) console.log(err);
+                    if (!result.length) return;
+                    connection.release();
+                    calUpdate(result, val, cateVal, moment(result[0].createTime).format('YYYY-MM-DD'));
+                });
+            });
+        });
+    });
+}
+
+function calUpdate(data, web, category, date, parentCnct) {
     var updateCount = 0;
     _.each(data, function(val, idx) {
         if (data.length - 1 == idx) return;
@@ -31,23 +57,27 @@ function actionDayAnalyze(data) {
 
         if (curCon != nextCon) {
             updateCount++;
-            // pool.getConnection(function(err, connection) {
-            //     var query = 'INSERT INTO update_record(updateTime, web, category) VALUES(?, ?, ?)';
-            //     connection.query(query, [nextItem.createTime, '手机腾讯网', '要闻'], function(err, result) {
-            //         connection.release();
-            //     });
-            // });
+            pool.getConnection(function(err, connection) {
+                var query = 'select * from update_record where web=? and category=? and updateTime=?'
+                connection.query(query, [web, category, nextItem.createTime], function(err, result) {
+                    if (!result.length) {
+                        var query = 'INSERT INTO update_record(updateTime, web, category, content) VALUES(?, ?, ?, ?)';
+                        connection.query(query, [nextItem.createTime, web, category, curCon + "##" + nextCon], function(err, result) {
+                            connection.release();
+                        });
+                    }
+                });
+            });
         }
     });
 
     if (!updateCount) return;
-
     pool.getConnection(function(err, connection) {
-        var query = 'select * from day_analyze where web=? and category=? and date=?'
-        connection.query(query, ['手机腾讯网', '要闻', '2015-12-14'], function(err, result) {
+        var query = 'select * from day_analyze where web=? and category=? and date=?';
+        connection.query(query, [web, category, date], function(err, result) {
             if (!result.length) {
-                var query = 'INSERT INTO day_analyze(date, updateCount, web, category) VALUES("2015-12-14", ?, ?, ?)';
-                connection.query(query, [updateCount, '手机腾讯网', '要闻'], function(err, result) {
+                var query = 'INSERT INTO day_analyze(date, updateCount, web, category) VALUES(?, ?, ?, ?)';
+                connection.query(query, [date, updateCount, web, category], function(err, result) {
                     connection.release();
                 });
             }
@@ -55,37 +85,8 @@ function actionDayAnalyze(data) {
     });
 }
 
-function dayAnalyze() {
-    _.each(WEB_ARR, function(val, idx) {
-        _.each(CATEGORY_ARR, function(cateVal, cateIdx) {
-            var query = [
-                'select * from report where web=? and category=? and ',
-                'unix_timestamp(createTime) > unix_timestamp(current_date()) and unix_timestamp(createTime) < (unix_timestamp(current_date()) + 86400)',
-            ].join('');
+dayAnalyze();
 
-            pool.getConnection(function(err, connection) {
-                connection.query(query, function(err, result) {
-                    if (err) console.log(err);
-
-                    _.each(result, function(val) {
-                        val.createTime = moment(val.createTime).format('YYYY-MM-DD HH:mm:ss');
-                        val.timestamp = +new Date(val.createTime);
-                    });
-
-                    actionDayAnalyze(result);
-
-                    res.render('analyze', {
-                        result: result
-                    });
-                    connection.release();
-                });
-            });
-        });
-    });
-}
-
-
- 
 module.exports = {
     add: function (req, res, next) {
         res.header("Access-Control-Allow-Origin", "*");
@@ -107,27 +108,6 @@ module.exports = {
                 jsonWrite(res, result);
  
                 // 释放连接
-                connection.release();
-            });
-        });
-    },
-
-    analyze: function (req, res, next) {
-        var query = 'select * from report where web="手机腾讯网" and category="要闻" order by createTime desc';
-        pool.getConnection(function(err, connection) {
-            connection.query(query, function(err, result) {
-                if (err) console.log(err);
-
-                _.each(result, function(val) {
-                    val.createTime = moment(val.createTime).format('YYYY-MM-DD HH:mm:ss');
-                    val.timestamp = +new Date(val.createTime);
-                });
-
-                actionDayAnalyze(result);
-
-                res.render('analyze', {
-                    result: result
-                });
                 connection.release();
             });
         });
