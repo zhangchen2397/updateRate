@@ -1,18 +1,79 @@
-var mysql = require('mysql');
+var mysql = require('./app/lib/mysql.js');
 var _ = require('underscore');
-var conf = require('./app/conf/db');
 var moment = require('moment');
 
 var WEB_ARR = ['手机腾讯网', '手机新浪网', '手机搜狐网'];
-var CATEGORY_ARR = ['要闻', '财经', '娱乐', '体育']
- 
-var pool  = mysql.createPool(_.extend({}, conf.mysql));
+var CATEGORY_ARR = ['要闻', '财经', '娱乐', '体育'];
 
+//2015-12-12 00:00:00
+//2015-12-12 12:00:00
+//2015-12-12 24:00:00
+
+//0 0      00:00:00
+//1 30     00:30:00
+//2 60     01:00:00
+//3 
+
+//每半小时统计一次
+function realTimeAnalyze(date) {
+    if (!date) {
+        date = moment(new Date()).format('YYYY-MM-DD');
+    }
+
+    for (var i = 0; i < 48; i++) {
+        var curTime = date + ' ' + formatTime(i * 30);
+        var nextTime = date + ' ' + formatTime((i + 1) * 30);
+
+        var curTimeStamp = (+new Date(curTime)) / 1000;
+        var nextTimeStamp = curTimeStamp + 30 * 60;
+
+        var query = [
+            'select count(*) as updateCount, web, category from update_record where ',
+            'unix_timestamp(updateTime) > ? and unix_timestamp(updateTime) < ? ',
+            'group by category, web'
+        ].join('');
+
+        (function(curTimeStamp, nextTimeStamp) {
+            mysql.execute(query, [curTimeStamp, nextTimeStamp], function(result) {
+                _.each(result, function(val, idx) {
+                    insertToRealTimeData(val, nextTimeStamp);
+                });
+            });
+        })(curTimeStamp, nextTimeStamp);
+    }
+}
+
+function insertToRealTimeData(val, timeStamp) {
+    var date = moment(timeStamp * 1000).format('YYYY-MM-DD hh:mm:ss');
+    var query = 'delete from realtime_analyze where web=? and category=? and date=?';
+    mysql.execute(query, [val.web, val.category, date], function(result) {
+        var query = 'insert into realtime_analyze(date, updateCount, web, category) values(?, ?, ?, ?)';
+        mysql.execute(query, [date, val.updateCount, val.web, val.category], function(result) {
+            console.log(val.web + '-' + val.category + ' insert realtime data done');
+        });
+    });
+}
+
+function formatTime(minutes) {
+    var hour = parseInt(minutes / 60, 10);
+    var minute = minutes % 60 || '00';
+
+    if (hour < 10) {
+        hour = '0' + hour;
+    }
+
+    return hour + ':' + minute + ':' + '00';
+}
+
+realTimeAnalyze('2015-12-15');
+
+
+ 
 //date '2015-12-15'
 function dayAnalyze(date) {
     var compareDate = (+new Date(moment(new Date()).format('YYYY-MM-DD'))) / 1000;
     if (date) {
-        compareDate = (+ new Date(date)) / 1000;
+        compareDate = (+new Date(date)) / 1000;
     }
 
     _.each(WEB_ARR, function(val, idx) {
@@ -22,13 +83,9 @@ function dayAnalyze(date) {
                 'unix_timestamp(createTime) > ? and unix_timestamp(createTime) < (? + 86400)'
             ].join('');
 
-            pool.getConnection(function(err, connection) {
-                connection.query(query, [val, cateVal, compareDate, compareDate], function(err, result) {
-                    if (err) console.log(err);
-                    if (!result.length) return;
-                    connection.release();
-                    calUpdate(result, val, cateVal, moment(result[0].createTime).format('YYYY-MM-DD'));
-                });
+            mysql.execute(query, [val, cateVal, compareDate, compareDate], function(result) {
+                if (!result.length) return;
+                calUpdate(result, val, cateVal, moment(result[0].createTime).format('YYYY-MM-DD'));
             });
         });
     });
@@ -44,16 +101,15 @@ function calUpdate(data, web, category, date) {
 
         if (curCon != nextCon) {
             updateCount++;
-            pool.getConnection(function(err, connection) {
-                var query = 'select * from update_record where web=? and category=? and updateTime=?'
-                connection.query(query, [web, category, nextItem.createTime], function(err, result) {
-                    if (!result.length) {
-                        var query = 'insert into update_record(updateTime, web, category, content) values(?, ?, ?, ?)';
-                        connection.query(query, [nextItem.createTime, web, category, curCon + "##" + nextCon], function(err, result) {
-                            connection.release();
-                        });
-                    }
-                });
+
+            var query = 'select * from update_record where web=? and category=? and updateTime=?'
+            mysql.execute(query, [web, category, nextItem.createTime], function(result) {
+                if (!result.length) {
+                    var query = 'insert into update_record(updateTime, web, category, content) values(?, ?, ?, ?)';
+                    mysql.execute(query, [nextItem.createTime, web, category, curCon + "##" + nextCon], function(result) {
+                        //console.log(result);
+                    });
+                }
             });
         }
     });
@@ -61,20 +117,16 @@ function calUpdate(data, web, category, date) {
     console.log(web + '-' + category + ' update count: ' + updateCount);
 
     if (!updateCount) return;
-    pool.getConnection(function(err, connection) {
-        var query = 'select * from day_analyze where web=? and category=? and date=?';
-        connection.query(query, [web, category, date], function(err, result) {
-            if (!result.length) {
-                var query = 'insert into day_analyze(date, updateCount, web, category) values(?, ?, ?, ?)';
-                connection.query(query, [date, updateCount, web, category], function(err, result) {
-                    console.log('analyze done');
-                    connection.release();
-                });
-            }
+
+    var query = 'delete from day_analyze where web=? and category=? and date=?';
+    mysql.execute(query, [web, category, date], function(result) {
+        var query = 'insert into day_analyze(date, updateCount, web, category) values(?, ?, ?, ?)';
+        mysql.execute(query, [date, updateCount, web, category], function(result) {
+            console.log(web + '-' + category + ' analyze done');
         });
     });
 }
 
-dayAnalyze();
-//dayAnalyze('2015-12-14');
-//dayAnalyze('2015-12-13');
+// dayAnalyze();
+//dayAnalyze('2015-12-15');
+// dayAnalyze('2015-12-13');
