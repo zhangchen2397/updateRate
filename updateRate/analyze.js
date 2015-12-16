@@ -5,15 +5,6 @@ var moment = require('moment');
 var WEB_ARR = ['手机腾讯网', '手机新浪网', '手机搜狐网'];
 var CATEGORY_ARR = ['要闻', '财经', '娱乐', '体育'];
 
-//2015-12-12 00:00:00
-//2015-12-12 12:00:00
-//2015-12-12 24:00:00
-
-//0 0      00:00:00
-//1 30     00:30:00
-//2 60     01:00:00
-//3 
-
 //每半小时统计一次
 function realTimeAnalyze(date) {
     if (!date) {
@@ -22,29 +13,30 @@ function realTimeAnalyze(date) {
 
     for (var i = 0; i < 48; i++) {
         var curTime = date + ' ' + formatTime(i * 30);
-        var nextTime = date + ' ' + formatTime((i + 1) * 30);
+        var nextTime = moment((+new Date(curTime)) + 30 * 60 * 1000).format('YYYY-MM-DD HH:mm:ss');
 
-        var curTimeStamp = (+new Date(curTime)) / 1000;
-        var nextTimeStamp = curTimeStamp + 30 * 60;
+        console.log(curTime);
+        console.log(nextTime);
+        console.log('========================');
 
         var query = [
             'select count(*) as updateCount, web, category from update_record where ',
-            'unix_timestamp(updateTime) > ? and unix_timestamp(updateTime) < ? ',
+            'unix_timestamp(updateTime) > unix_timestamp(?) and unix_timestamp(updateTime) < unix_timestamp(?) ',
             'group by category, web'
         ].join('');
 
-        (function(curTimeStamp, nextTimeStamp) {
-            mysql.execute(query, [curTimeStamp, nextTimeStamp], function(result) {
+        (function(curTime, nextTime) {
+            mysql.execute(query, [curTime, nextTime], function(result) {
                 _.each(result, function(val, idx) {
-                    insertToRealTimeData(val, nextTimeStamp);
+                    insertToRealTimeData(val, nextTime);
                 });
             });
-        })(curTimeStamp, nextTimeStamp);
+        })(curTime, nextTime);
     }
 }
 
 function insertToRealTimeData(val, timeStamp) {
-    var date = moment(timeStamp * 1000).format('YYYY-MM-DD hh:mm:ss');
+    var date = moment(timeStamp).format('YYYY-MM-DD HH:mm:ss');
     var query = 'delete from realtime_analyze where web=? and category=? and date=?';
     mysql.execute(query, [val.web, val.category, date], function(result) {
         var query = 'insert into realtime_analyze(date, updateCount, web, category) values(?, ?, ?, ?)';
@@ -67,25 +59,28 @@ function formatTime(minutes) {
 
 realTimeAnalyze('2015-12-15');
 
+// dayAnalyze();
+// dayAnalyze('2015-12-15');
+// dayAnalyze('2015-12-14');
+// dayAnalyze('2015-12-13');
 
  
 //date '2015-12-15'
 function dayAnalyze(date) {
-    var compareDate = (+new Date(moment(new Date()).format('YYYY-MM-DD'))) / 1000;
-    if (date) {
-        compareDate = (+new Date(date)) / 1000;
+    if (!date) {
+        date = moment(new Date()).format('YYYY-MM-DD');
     }
 
     _.each(WEB_ARR, function(val, idx) {
         _.each(CATEGORY_ARR, function(cateVal, cateIdx) {
             var query = [
                 'select * from report where web=? and category=? and ',
-                'unix_timestamp(createTime) > ? and unix_timestamp(createTime) < (? + 86400)'
+                'unix_timestamp(createTime) > unix_timestamp(?) and unix_timestamp(createTime) < (unix_timestamp(?) + 86400)'
             ].join('');
 
-            mysql.execute(query, [val, cateVal, compareDate, compareDate], function(result) {
+            mysql.execute(query, [val, cateVal, date, date], function(result) {
                 if (!result.length) return;
-                calUpdate(result, val, cateVal, moment(result[0].createTime).format('YYYY-MM-DD'));
+                calUpdate(result, val, cateVal, date);
             });
         });
     });
@@ -126,7 +121,3 @@ function calUpdate(data, web, category, date) {
         });
     });
 }
-
-// dayAnalyze();
-//dayAnalyze('2015-12-15');
-// dayAnalyze('2015-12-13');
