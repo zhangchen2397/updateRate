@@ -7,22 +7,20 @@ module.exports = {
         var queryParam = [param.content, param.web, param.category]; 
         var query = 'INSERT INTO report(content, web, category) VALUES(?,?,?)';
         
-        mysql.execute(query, queryParam, function(result) {
-            if(result) {
-                result = {
-                    code: 200,
-                    msg: '增加成功'
+        mysql.execute(query, queryParam, function(err, result) {
+            var rtData = {
+                code: 0,
+                msg: '增加成功'
+            };
+
+            if (err) {
+                rtData = {
+                    code: 1,
+                    msg: '增加失败'
                 };
             }
-
-            if(typeof result === 'undefined') {
-                res.json({
-                    code:'1',
-                    msg: '操作失败'
-                });
-            } else {
-                res.json(result);
-            }
+            
+            res.json(rtData);
         });
     }
 };

@@ -11,13 +11,12 @@ var execute = function(sql, args, callback){
             conn.query(sql, args, function(err,res){  
                 //释放连接  
                 conn.release();
-                //事件驱动回调
+                
                 if (err) {
                     console.error('[sql query error] '+ err.stack);
-                    return;
                 }
 
-                callback(res);
+                callback(err, res);
             });  
         }  
     });  
