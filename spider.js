@@ -53,9 +53,11 @@ function getQQListData() {
                         var listEl = $('#' + value.id + ' .lincoapp-home-list>li');
 
                         $.each(listEl, function(subIdx, subVal) {
-                            var fullText = $.trim($(subVal).text());
-                            if (!/广告/g.test(fullText)) {
-                                curItemData.content.push($.trim($($(subVal).find('p')).text()));
+                            if (curItemData.content.length < 8) {
+                                var fullText = $.trim($(subVal).text());
+                                if (!/广告/g.test(fullText)) {
+                                    curItemData.content.push($.trim($($(subVal).find('p')).text()));
+                                }
                             }
                         });
 
@@ -153,9 +155,11 @@ function getSohuListData() {
                         var listEl = $('.' + value.className).parent('.cnl').find('.ls>.it');
 
                         $.each(listEl, function(subIdx, subVal) {
-                            var curItem = $(subVal);
-                            if (!curItem.attr('id')) {
-                                curItemData.content.push($.trim(curItem.text()));
+                            if (curItemData.content.length < 8) {
+                                var curItem = $(subVal);
+                                if (!curItem.attr('id')) {
+                                    curItemData.content.push($.trim(curItem.text()));
+                                }
                             }
                         });
 
@@ -276,9 +280,11 @@ function getSinaListData() {
 
                             //列表数据
                             $.each($(subItem.find('dl.f_card')), function() {
-                                var fullText = $.trim($(this).text());
-                                if (!/赞助/g.test(fullText)) {
-                                    curItemData.content.push($.trim($($(this).find('h3')).text()));
+                                if (curItemData.content.length < 8) {
+                                    var fullText = $.trim($(this).text());
+                                    if (!/赞助/g.test(fullText)) {
+                                        curItemData.content.push($.trim($($(this).find('h3')).text()));
+                                    }
                                 }
                             });
                         });
