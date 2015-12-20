@@ -59,13 +59,13 @@ function formatTime(minutes) {
     return hour + ':' + minute + ':' + '00';
 }
 
-realTimeAnalyze('2015-12-17');
+// realTimeAnalyze('2015-12-17');
 // realTimeAnalyze('2015-12-16');
 // realTimeAnalyze('2015-12-15');
 // realTimeAnalyze('2015-12-14');
 // realTimeAnalyze('2015-12-13');
 
-//dayAnalyze();
+dayAnalyze();
 // dayAnalyze('2015-12-17');
 // dayAnalyze('2015-12-15');
 // dayAnalyze('2015-12-14');
