@@ -57,7 +57,7 @@ module.exports = {
                 queryArr.push(date);
             } else {
                 var nextDate = moment(+new Date(date) + 86400 * 1000).format('YYYY-MM-DD');
-                queryStr += ' and unix_timestamp(date) > unix_timestamp(?) and unix_timestamp(date) < unix_timestamp(?)';
+                queryStr += ' and unix_timestamp(date) > unix_timestamp(?) and unix_timestamp(date) <= unix_timestamp(?)';
                 queryArr.push(date, nextDate);
             }
             

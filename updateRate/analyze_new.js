@@ -24,6 +24,10 @@ function insertUpdateRecord(date) {
                     return reject(err);
                 }
 
+                if (result.length < 1) {
+                    return resolve(web + '-' + category + ' no data');
+                }
+
                 actInsert(result, resolve, reject);
             });
         });
@@ -146,11 +150,21 @@ function realTimeAnalyze(date) {
 }
 
 function run(date) {
+    process.stdout.write('starting analyze');
+    var startAnalyzeTime = +new Date();
+    var waitTimer = setInterval(function() {
+        process.stdout.write('.');
+    }, 100);
+
     if (!date) {
         date = moment(new Date()).format('YYYY-MM-DD');
     }
 
     insertUpdateRecord(date).then(function(result) {
+        clearInterval(waitTimer);
+        var totalAnalyzeTime = parseInt((+new Date() - startAnalyzeTime) / 1000, 10);
+        console.log(totalAnalyzeTime + 's, analyze ok');
+
         dayAnalyze(date);
         realTimeAnalyze(date);
     }, function(error) {
@@ -160,4 +174,4 @@ function run(date) {
     });
 }
 
-run('2015-12-20');
+run('2015-12-13');
