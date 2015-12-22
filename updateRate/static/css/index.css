@@ -1,0 +1,79 @@
+.clearfix:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+.clearfix{*+height:1%;}
+
+ul, ul li {
+    list-style: none;
+}
+
+.page-content {
+    padding: 20px 50px;
+}
+
+.chart-wrap {
+    padding: 20px 0;
+}
+
+.titleTab {
+    position: relative;
+    text-align: center;
+}
+
+.titleTab .mdl-button {
+    height: 30px;
+    line-height: 30px;
+}
+
+.titleTab:before {
+    position: absolute;
+    top: 50%;
+    display: block;
+    content: "";
+    width: 100%;
+    height: 1px;
+    background-color: #E5E7EC;
+}
+
+.type-filter {
+    position: relative;
+    display: inline-block;
+    z-index: 2;
+    background-color: #FFFFFF;
+}
+
+
+.type-filter button {
+    margin: 0 8px;
+}
+
+.chart {
+    margin-top: 30px;
+}
+
+.table-wrap {
+    margin-top: 15px;
+}
+
+.table-wrap table {
+    width: 100%;
+}
+
+.switch-menu {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.cur-choice {
+    position: absolute;
+    left: 40px;
+    top: 5px;
+}
+
+.rowspan {
+    vertical-align: middle!important;
+    border-right: 1px solid rgba(0,0,0,.12);
+}
+
+.mul-filter {
+    float: left;
+    width: 150px;
+}

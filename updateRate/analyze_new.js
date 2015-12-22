@@ -74,7 +74,7 @@ function insertUpdateRecord(date) {
 
                     resolve(rstStr + ' update count: ' + updateCount);
                 });
-            });  
+            });
         });
     }
 }
@@ -174,4 +174,4 @@ function run(date) {
     });
 }
 
-run('2015-12-13');
+run();

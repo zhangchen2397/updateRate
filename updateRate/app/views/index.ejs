@@ -1,12 +1,404 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-    <title><%= title %></title>
-    <link rel="stylesheet" href="/css/style.css">
-</head>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="update rate">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>实时更新率</title>
+    <link rel="stylesheet" href="/css/material.indigo-pink.min.css">
+    <link rel="stylesheet" href="/css/material.blue-indigo.min.css" />
+    <link rel="stylesheet" href="/css/index.css" />
+    <link rel="stylesheet" href="/css/icon.css">
+  </head>
 
-<body>
-    <h1>Express</h1>
-    <p>Welcome to <%= title %></p>
-</body>
+  <body>
+
+  <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header">
+      <div class="mdl-layout__header-row">
+        <span class="mdl-layout-title">Update Rate</span>
+        <div class="mdl-layout-spacer"></div>
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable mdl-textfield--floating-label mdl-textfield--align-right">
+          <label class="mdl-button mdl-js-button mdl-button--icon" for="fixed-header-drawer-exp">
+            <i class="material-icons">search</i>
+          </label>
+          <div class="mdl-textfield__expandable-holder">
+            <input class="mdl-textfield__input" type="text" name="sample" id="fixed-header-drawer-exp">
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="mdl-layout__drawer">
+      <span class="mdl-layout-title">Update Rate</span>
+      <nav class="mdl-navigation">
+        <a class="mdl-navigation__link" href="">手机腾讯网</a>
+        <a class="mdl-navigation__link" href="">手机新浪网</a>
+        <a class="mdl-navigation__link" href="">手机搜狐网</a>
+        <a class="mdl-navigation__link" href="">手机网易网</a>
+      </nav>
+    </div>
+
+    <main class="mdl-layout__content">
+      <div class="page-content">
+        <div id="updateByWeb" class="chart-wrap">
+          <div class="titleTab">
+            <div class="type-filter">
+              <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">qq</button>
+              <button class="mdl-button mdl-js-button mdl-js-ripple-effect">sina</button>
+              <button class="mdl-button mdl-js-button mdl-js-ripple-effect">sohu</button>
+              <button class="mdl-button mdl-js-button mdl-js-ripple-effect">163</button>
+            </div>
+          </div>
+
+          <div id="chart-byweb" class="chart" style="height:560px"></div>
+        </div>
+
+        <div id="updateByCate" class="chart-wrap">
+          <div class="titleTab">
+            <div class="type-filter">
+              <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">要闻</button>
+              <button class="mdl-button mdl-js-button mdl-js-ripple-effect">体育</button>
+              <button class="mdl-button mdl-js-button mdl-js-ripple-effect">财经</button>
+              <button class="mdl-button mdl-js-button mdl-js-ripple-effect">娱乐</button>
+            </div>
+          </div>
+
+          <div id="chart-bycate" class="chart" style="height:560px"></div>
+        </div>
+
+        <div id="updateTable" class="chart-wrap">
+          <div class="titleTab">
+            <div class="type-filter">
+              <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">TABLE</button>
+            </div>
+          </div>
+
+          <div class="mdl-grid table-wrap">
+            <div class="mdl-cell mdl-cell--4-col mdl-cell--1-col-tablet">
+              <div class="switch-menu">
+                <button id="menu-lower-left" class="mdl-button mdl-js-button mdl-button--icon">
+                  <i class="material-icons">more_vert</i>
+                </button>
+
+                <p class="cur-choice">腾讯</p>
+
+                <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="menu-lower-left">
+                  <li class="mdl-menu__item">新浪</li>
+                  <li class="mdl-menu__item">搜狐</li>
+                  <li class="mdl-menu__item">网易</li>
+                </ul>
+              </div>
+
+              <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+                <thead>
+                  <tr>
+                    <th class="mdl-data-table__cell--non-numeric">Date</th>
+                    <th>Category</th>
+                    <th>Update Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td rowspan=4 class="mdl-data-table__cell--non-numeric rowspan">2015-12-11</td>
+                    <td>要闻</td>
+                    <td>32</td>
+                  </tr>
+                  <tr>
+                    <td>体育</td>
+                    <td>39</td>
+                  </tr>
+                  <tr>
+                    <td>财经</td>
+                    <td>64</td>
+                  </tr>
+                  <tr>
+                    <td>娱乐</td>
+                    <td>45</td>
+                  </tr>
+                  <tr>
+                    <td rowspan=4 class="mdl-data-table__cell--non-numeric rowspan">2015-12-10</td>
+                    <td>要闻</td>
+                    <td>32</td>
+                  </tr>
+                  <tr>
+                    <td>体育</td>
+                    <td>39</td>
+                  </tr>
+                  <tr>
+                    <td>财经</td>
+                    <td>64</td>
+                  </tr>
+                  <tr>
+                    <td>娱乐</td>
+                    <td>45</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mdl-cell mdl-cell--4-col mdl-cell--1-col-tablet">
+              <div class="switch-menu">
+                <button id="menu-lower-left2" class="mdl-button mdl-js-button mdl-button--icon">
+                  <i class="material-icons">more_vert</i>
+                </button>
+
+                <p class="cur-choice">要闻</p>
+
+                <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="menu-lower-left2">
+                  <li class="mdl-menu__item">体育</li>
+                  <li class="mdl-menu__item">财经</li>
+                  <li class="mdl-menu__item">娱乐</li>
+                </ul>
+              </div>
+
+              <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+                <thead>
+                  <tr>
+                    <th class="mdl-data-table__cell--non-numeric">Date</th>
+                    <th>Category</th>
+                    <th>Update Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td rowspan=4 class="mdl-data-table__cell--non-numeric rowspan">2015-12-11</td>
+                    <td>腾讯</td>
+                    <td>32</td>
+                  </tr>
+                  <tr>
+                    <td>新浪</td>
+                    <td>39</td>
+                  </tr>
+                  <tr>
+                    <td>搜狐</td>
+                    <td>64</td>
+                  </tr>
+                  <tr>
+                    <td>网易</td>
+                    <td>45</td>
+                  </tr>
+                  <tr>
+                    <td rowspan=4 class="mdl-data-table__cell--non-numeric rowspan">2015-12-10</td>
+                    <td>腾讯</td>
+                    <td>32</td>
+                  </tr>
+                  <tr>
+                    <td>新浪</td>
+                    <td>39</td>
+                  </tr>
+                  <tr>
+                    <td>搜狐</td>
+                    <td>64</td>
+                  </tr>
+                  <tr>
+                    <td>网易</td>
+                    <td>45</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mdl-cell mdl-cell--4-col mdl-cell--1-col-tablet">
+              <div class="filter-list clearfix">
+                <div class="switch-menu mul-filter">
+                  <button id="menu-lower-left3" class="mdl-button mdl-js-button mdl-button--icon">
+                    <i class="material-icons">more_vert</i>
+                  </button>
+
+                  <p class="cur-choice">2015-12-22</p>
+
+                  <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="menu-lower-left3">
+                    <li class="mdl-menu__item">2015-12-22</li>
+                    <li class="mdl-menu__item">2015-12-21</li>
+                    <li class="mdl-menu__item">2015-12-20</li>
+                    <li class="mdl-menu__item">2015-12-19</li>
+                    <li class="mdl-menu__item">2015-12-18</li>
+                  </ul>
+                </div>
+
+                <div class="switch-menu mul-filter">
+                  <button id="menu-lower-left4" class="mdl-button mdl-js-button mdl-button--icon">
+                    <i class="material-icons">more_vert</i>
+                  </button>
+
+                  <p class="cur-choice">腾讯</p>
+
+                  <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="menu-lower-left4">
+                    <li class="mdl-menu__item">新浪</li>
+                    <li class="mdl-menu__item">搜狐</li>
+                    <li class="mdl-menu__item">网易</li>
+                  </ul>
+                </div>
+              </div>
+
+              <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+                <thead>
+                  <tr>
+                    <th class="mdl-data-table__cell--non-numeric">Time</th>
+                    <th>Category</th>
+                    <th>Update Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td rowspan=4 class="rowspan mdl-data-table__cell--non-numeric">00:00 ~ 01:00</td>
+                    <td>要闻</td>
+                    <td>30</td>
+                  </tr>
+                  <tr>
+                    <td>体育</td>
+                    <td>39</td>
+                  </tr>
+                  <tr>
+                    <td>娱乐</td>
+                    <td>86</td>
+                  </tr>
+                  <tr>
+                    <td>财经</td>
+                    <td>93</td>
+                  </tr>
+                  <tr>
+                    <td rowspan=4 class="rowspan mdl-data-table__cell--non-numeric">01:00 ~ 02:00</td>
+                    <td>要闻</td>
+                    <td>30</td>
+                  </tr>
+                  <tr>
+                    <td>体育</td>
+                    <td>39</td>
+                  </tr>
+                  <tr>
+                    <td>娱乐</td>
+                    <td>86</td>
+                  </tr>
+                  <tr>
+                    <td>财经</td>
+                    <td>93</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+
+  <script src="/js/material.min.js"></script>
+  <script src="/js/echarts-all.js"></script>
+  <script type="text/javascript">
+      option = {
+          title : {
+              text: '按网站各频道更新次数',
+              subtext: ''
+          },
+          tooltip : {
+              trigger: 'axis'
+          },
+          legend: {
+              data:['要闻','财经', '体育', '娱乐']
+          },
+          toolbox: {
+              show : true,
+              feature : {
+                  mark : {show: true},
+                  dataView : {show: true, readOnly: false},
+                  magicType : {show: true, type: ['line', 'bar']},
+                  restore : {show: true},
+                  saveAsImage : {show: true}
+              }
+          },
+          calculable : true,
+          xAxis : [
+              {
+                  type : 'category',
+                  boundaryGap : false,
+                  data : ['12/12','12/13','12/14','12/15','12/16','12/17','12/18', '12/19','12/20','12/21']
+              }
+          ],
+          yAxis : [
+              {
+                  type : 'value',
+                  axisLabel : {
+                      formatter: '{value}'
+                  }
+              }
+          ],
+          series : [
+              {
+                  name:'要闻',
+                  type:'line',
+                  data:[28, 18, 29, 39, 43, 35, 33, 25, 46, 29],
+                  markPoint : {
+                      data : [
+                          {type : 'max', name: '最大值'},
+                          {type : 'min', name: '最小值'}
+                      ]
+                  },
+                  markLine : {
+                      data : [
+                          {type : 'average', name: '平均值'}
+                      ]
+                  }
+              },
+              {
+                  name:'财经',
+                  type:'line',
+                  data:[89, 62, 73, 44, 69, 83, 73, 44, 59, 89],
+                  markPoint : {
+                      data : [
+                          {type : 'max', name: '最大值'},
+                          {type : 'min', name: '最小值'}
+                      ]
+                  },
+                  markLine : {
+                      data : [
+                          {type : 'average', name : '平均值'}
+                      ]
+                  }
+              },
+              {
+                  name:'体育',
+                  type:'line',
+                  data:[55, 46, 59, 53, 53, 59, 50, 44, 46, 42],
+                  markPoint : {
+                      data : [
+                          {type : 'max', name: '最大值'},
+                          {type : 'min', name: '最小值'}
+                      ]
+                  },
+                  markLine : {
+                      data : [
+                          {type : 'average', name : '平均值'}
+                      ]
+                  }
+              },
+              {
+                  name:'娱乐',
+                  type:'line',
+                  data:[69, 73, 59, 68, 68, 72, 83, 66, 95, 70],
+                  markPoint : {
+                      data : [
+                          {type : 'max', name: '最大值'},
+                          {type : 'min', name: '最小值'}
+                      ]
+                  },
+                  markLine : {
+                      data : [
+                          {type : 'average', name : '平均值'}
+                      ]
+                  }
+              }
+          ]
+      };
+
+      var myChart = echarts.init(document.getElementById('chart-byweb'), 'macarons'); 
+      myChart.setOption(option);
+
+      var myChart2 = echarts.init(document.getElementById('chart-bycate'), 'macarons'); 
+      myChart2.setOption(option);
+  </script>
+  </body>
 </html>
