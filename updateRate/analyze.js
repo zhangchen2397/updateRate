@@ -71,7 +71,7 @@ dayAnalyze();
 // dayAnalyze('2015-12-14');
 // dayAnalyze('2015-12-13');
 
- 
+
 //date '2015-12-15'
 function dayAnalyze(date) {
     if (!date) {

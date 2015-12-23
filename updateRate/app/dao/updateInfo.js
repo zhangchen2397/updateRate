@@ -1,8 +1,8 @@
 var mysql = require('../lib/mysql');
 var moment = require('moment');
- 
+
 module.exports = {
-    query: function (req, res, next) {
+    query: function(req, res, next) {
         var param = req.query || req.params;
 
         var type = param.type,
@@ -60,7 +60,7 @@ module.exports = {
                 queryStr += ' and unix_timestamp(date) > unix_timestamp(?) and unix_timestamp(date) <= unix_timestamp(?)';
                 queryArr.push(date, nextDate);
             }
-            
+
             if (web) {
                 queryStr += ' and web=?';
                 queryArr.push(web);
