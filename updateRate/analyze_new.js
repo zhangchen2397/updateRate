@@ -174,4 +174,4 @@ function run(date) {
     });
 }
 
-run();
+run('2015-12-22');

@@ -3,9 +3,10 @@ phantom.outputEncoding = "GBK";
 
 var JQ_URL = '//code.jquery.com/jquery-1.11.3.min.js';
 var WEB_URL_MAP = {
-    qq: 'http://info.3g.qq.com/g/s?aid=index&g_ut=3',
-    sina: 'http://sina.cn',
-    sohu: 'http://m.sohu.com/?v=3&amp;_once_=sohu_version_3&amp;_smuid=FvsOWg2jhdCXP9sr2GgLja'
+    'qq': 'http://info.3g.qq.com/g/s?aid=index&g_ut=3',
+    'sina': 'http://sina.cn',
+    'sohu': 'http://m.sohu.com/?v=3&amp;_once_=sohu_version_3&amp;_smuid=FvsOWg2jhdCXP9sr2GgLja',
+    '163': 'http://3g.163.com/touch'
 };
 var REPORT_URL = 'http://localhost:3000/report/add';
 
@@ -146,6 +147,8 @@ function getSohuListData() {
                         name: '体育'
                     }];
 
+                    var contentLen = 8;
+
                     $.each(cateArr, function(index, value) {
                         var curItemData = {
                             cateName: value.name,
@@ -154,8 +157,15 @@ function getSohuListData() {
 
                         var listEl = $('.' + value.className).parent('.cnl').find('.ls>.it');
 
+                        //sohu体育的列表数据会随机变化，只取前3条
+                        if (value.name == '体育') {
+                            contentLen = 3;
+                        } else {
+                            contentLen = 8
+                        }
+
                         $.each(listEl, function(subIdx, subVal) {
-                            if (curItemData.content.length < 8) {
+                            if (curItemData.content.length < contentLen) {
                                 var curItem = $(subVal);
                                 if (!curItem.attr('id')) {
                                     curItemData.content.push($.trim(curItem.text()));
@@ -334,6 +344,116 @@ function getSinaListData() {
 
     page.onClosing = function() {
         console.log('close sina page');
+        console.log('=======================');
+        get163ListData();
+    }
+}
+
+function get163ListData() {
+    console.log('open 163 web');
+    page = require( 'webpage' ).create();
+
+    page.onConsoleMessage = function(msg) {
+        //console.log(msg);
+    };
+
+    page.onError = function(msg, trace) {
+        //console.error(msg);
+    }
+
+    page.open(WEB_URL_MAP['163'], function(status) {
+        page.includeJs(JQ_URL, function() {
+            var rst = page.evaluate(function(reportUrl) {
+                function getWebData() {
+                    var rst = {
+                        webName: '手机网易网',
+                        list: []
+                    };
+
+                    var cateArr = [{
+                        selector: '.m-emphasis ul li a',
+                        name: '要闻'
+                    }, {
+                        selector: '.stockWrapper',
+                        name: '财经'
+                    }, {
+                        selector: '.amusement .newsList ul li ul li a',
+                        name: '娱乐'
+                    }, {
+                        selector: '.sport-tab div.u-list>ul>li ul li a',
+                        name: '体育'
+                    }];
+
+                    $.each(cateArr, function(index, value) {
+                        var curItemData = {
+                            cateName: value.name,
+                            content: []
+                        };
+
+                        var listEl = $(value.selector);
+                        if (value.name == '财经') {
+                            listEl = $(value.selector).siblings('.newsPage').find('li a');
+                        }
+
+                        $.each(listEl, function(subIdx, subVal) {
+                            if (curItemData.content.length < 8) {
+                                if (value.name == '体育') {
+                                    if (subIdx > 7) {
+                                        var text = $.trim($(subVal).html().split('<span>')[0]);
+                                        curItemData.content.push(text);
+                                    }
+                                } else {
+                                    var text = $.trim($(subVal).html().split('<span>')[0]);
+                                    curItemData.content.push(text);
+                                }
+                            }
+                        });
+
+                        rst.list.push(curItemData);
+                    });
+
+                    return rst;
+                }
+
+                //上报抓取数据
+                var rst = getWebData();
+                $.each(rst.list, function(index, value) {
+                    $.ajax({
+                        url: reportUrl,
+                        data: {
+                            content: value.content.join('@'),
+                            web: rst.webName,
+                            category: value.cateName
+                        }
+                    }).done(function(data) {
+                        console.log(JSON.stringify(data));
+                    }).fail(function(data) {
+                        console.log(JSON.stringify(data));
+                    });
+                });
+
+                return rst;
+            }, REPORT_URL);
+
+            RESULT.push(rst);
+
+            console.log('spider 163 web success');
+
+            var server = require('webserver').create();
+            server.listen(8080, function(request, response) {
+                response.statusCode = 200;
+                response.write('<html><body>' + JSON.stringify(RESULT) + '</body></html>');
+                response.close();
+            });
+
+            setTimeout(function() {
+                page.close();
+            }, 500);
+        });
+    });
+
+    page.onClosing = function() {
+        console.log('close 163 page');
         console.log('=======================');
     }
 }
