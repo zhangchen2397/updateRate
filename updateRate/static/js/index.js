@@ -11,15 +11,8 @@
     }
 
     var charOption = {
-        title: {
-            text: '',
-            subtext: ''
-        },
         tooltip: {
             trigger: 'axis'
-        },
-        legend: {
-            data: []
         },
         toolbox: {
             show: true,
@@ -46,16 +39,14 @@
         calculable: true,
         xAxis: [{
             type: 'category',
-            boundaryGap: false,
-            data: []
+            boundaryGap: false
         }],
         yAxis: [{
             type: 'value',
             axisLabel: {
                 formatter: '{value}'
             }
-        }],
-        series: []
+        }]
     };
 
     var chartData = {
@@ -68,14 +59,57 @@
         byweb: {
             data: 'cateList',
             key: 'category',
-            eachArr: CATEGORY_ARR
+            eachArr: CATEGORY_ARR,
+            chartTitle: '按网站各频道更新次数',
+            id: 'chart-byweb',
+            tableId: 'table-byweb'
         },
         bycate: {
             data: 'webList',
             key: 'web',
-            eachArr: WEB_ARR
+            eachArr: WEB_ARR,
+            chartTitle: '按频道各网站更新次数',
+            id: 'chart-bycate',
+            tableId: 'table-bycate'
         }
     };
+
+    function renderTable(type) {
+        var ftType = formatMap[type];
+        var str = [
+            '<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">',
+            '<thead>',
+                '<tr>',
+                    '<th class="mdl-data-table__cell--non-numeric">Date</th>',
+                    '<th>Category</th>',
+                    '<th>Update Count</th>',
+                '</tr>',
+            '</thead>',
+            '<tbody>'
+        ].join('');
+
+        $.each(chartData.dateList, function(idx, val) {
+            var isFirst = true;
+            $.each(chartData[ftType.data], function(key, subVal) {
+                var tempTr = '';
+                if (isFirst) {
+                    isFirst = false;
+                    tempTr = '<td rowspan=' + ftType.eachArr.length + ' class="mdl-data-table__cell--non-numeric rowspan">' + val + '</td>'
+                }
+
+                str += [
+                    '<tr>',
+                        tempTr,
+                        '<td>' + key + '</td>',
+                        '<td>' + subVal[idx] + '</td>',
+                    '</tr>'
+                ].join('');
+            });
+        });
+
+        str += '</tbody></table>';
+        $('#' + ftType.tableId).html($(str));
+    }
 
     var pageRun = {
         init: function() {
@@ -118,7 +152,8 @@
                 if (data.code == 0) {
                     if (ftType) {
                         me.formatData(data.list, ftType);
-                        me.renderChart();
+                        me.renderChart(ftType);
+                        renderTable(ftType);
                     }
                 } else {
                     alert('系统错误，请重试');
@@ -164,14 +199,59 @@
                             chartData[dataList][val].splice(dateIdx, 0, '0');
                         }
                     });
+
+                    $.each(chartData[dataList][val], function(subIdx, subVal) {
+                        chartData[dataList][val][subIdx] = parseInt(subVal, 10);
+                    });
                 }
             });
-
-            console.log(chartData);
         },
 
-        renderChart: function() {
+        renderChart: function(type) {
+            var chartType = formatMap[type],
+                curChartData = null;
 
+            var curChartData = {
+                title: {
+                    text: chartType.chartTitle
+                },
+                legend: {
+                    data: []
+                },
+                xAxis: [{
+                    data: chartData.dateList
+                }],
+                series: []
+            };
+
+            $.each(chartData[chartType.data], function(key, val) {
+                curChartData.legend.data.push(key);
+                curChartData.series.push({
+                    name: key,
+                    type: 'line',
+                    data: val,
+                    markPoint: {
+                        data: [{
+                            type: 'max',
+                            name: '最大值'
+                        }, {
+                            type: 'min',
+                            name: '最小值'
+                        }]
+                    },
+                    markLine: {
+                        data: [{
+                            type: 'average',
+                            name: '平均值'
+                        }]
+                    }
+                });
+            });
+
+            curChartData = $.extend(true, {}, charOption, curChartData);
+
+            var myChart = echarts.init(document.getElementById(chartType.id), 'macarons'); 
+            myChart.setOption(curChartData);
         },
 
         getDateList: function() {
