@@ -8,7 +8,8 @@ module.exports = {
         var type = param.type,
             web = param.web,
             category = param.category,
-            date = param.date || moment(new Date()).format('YYYY-MM-DD');
+            date = param.date || moment(new Date()).format('YYYY-MM-DD'),
+            endDate = param.endDate;
 
         var rtFailData = {
             code: 2,
@@ -53,8 +54,13 @@ module.exports = {
             var queryArr = [];
 
             if (table == 'day_analyze') {
-                queryStr += ' and date=?';
-                queryArr.push(date);
+                if (endDate) {
+                    queryStr += ' and unix_timestamp(date) >= unix_timestamp(?) and unix_timestamp(date) <= unix_timestamp(?)';
+                    queryArr.push(date, endDate);
+                } else {
+                    queryStr += ' and date=?';
+                    queryArr.push(date);
+                }
             } else {
                 var nextDate = moment(+new Date(date) + 86400 * 1000).format('YYYY-MM-DD');
                 queryStr += ' and unix_timestamp(date) > unix_timestamp(?) and unix_timestamp(date) <= unix_timestamp(?)';
@@ -70,6 +76,8 @@ module.exports = {
                 queryStr += ' and category=?';
                 queryArr.push(category);
             }
+
+            queryStr += ' order by unix_timestamp(date)';
 
             return {
                 queryStr: queryStr,

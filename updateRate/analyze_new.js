@@ -1,7 +1,7 @@
 var mysql = require('./app/lib/mysql.js');
 var moment = require('moment');
 
-var WEB_ARR = ['手机腾讯网', '手机新浪网', '手机搜狐网'];
+var WEB_ARR = ['腾讯', '新浪', '搜狐', '网易'];
 var CATEGORY_ARR = ['要闻', '财经', '娱乐', '体育'];
 var DAY_ALALYZE_DATA = [];
 
@@ -174,4 +174,4 @@ function run(date) {
     });
 }
 
-run('2015-12-22');
+run();

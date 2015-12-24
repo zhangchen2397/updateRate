@@ -27,7 +27,7 @@ function getQQListData() {
             var rst = page.evaluate(function(reportUrl) {
                 function getWebData() {
                     var rst = {
-                        webName: '手机腾讯网',
+                        webName: '腾讯',
                         list: []
                     };
 
@@ -129,7 +129,7 @@ function getSohuListData() {
             var rst = page.evaluate(function(reportUrl) {
                 function getWebData() {
                     var rst = {
-                        webName: '手机搜狐网',
+                        webName: '搜狐',
                         list: []
                     };
 
@@ -240,7 +240,7 @@ function getSinaListData() {
             var rst = page.evaluate(function(reportUrl) {
                 function getWebData() {
                     var rst = {
-                        webName: '手机新浪网',
+                        webName: '新浪',
                         list: []
                     };
 
@@ -366,7 +366,7 @@ function get163ListData() {
             var rst = page.evaluate(function(reportUrl) {
                 function getWebData() {
                     var rst = {
-                        webName: '手机网易网',
+                        webName: '网易',
                         list: []
                     };
 
