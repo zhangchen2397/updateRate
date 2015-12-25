@@ -3,7 +3,7 @@ phantom.outputEncoding = "GBK";
 
 var JQ_URL = '//code.jquery.com/jquery-1.11.3.min.js';
 var WEB_URL_MAP = {
-    'qq': 'http://info.3g.qq.com/g/s?aid=index&g_ut=3',
+    'qq': 'http://info.3g.qq.com/g/s?aid=index&g_ut=3&g_ver=0',
     'sina': 'http://sina.cn',
     'sohu': 'http://m.sohu.com/?v=3&amp;_once_=sohu_version_3&amp;_smuid=FvsOWg2jhdCXP9sr2GgLja',
     '163': 'http://3g.163.com/touch'

@@ -55,7 +55,9 @@
         cateList: {},
         webList: {},
 
-        timeList: ['02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '00:00'],
+        timeList: ['02:00', '04:00', '06:00', '08:00', '10:00', 
+            '12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '00:00'
+        ],
         showTimeList: [],
         realtimeCateList: {}
     };
@@ -68,6 +70,7 @@
             chartTitle: '按网站各频道更新次数',
             id: 'chart-byweb',
             tableId: 'table-byweb',
+            progressId: 'progress-byweb',
             type: 'day'
         },
         bycate: {
@@ -77,6 +80,7 @@
             chartTitle: '按频道各网站更新次数',
             id: 'chart-bycate',
             tableId: 'table-bycate',
+            progressId: 'progress-bycate',
             type: 'day'
         },
 
@@ -87,6 +91,7 @@
             chartTitle: '24小时更新趋势 - ' + moment(LAST_DAY).format('YYYY-MM-DD'),
             id: 'realtime-chart-byweb',
             tableId: 'realtime-table-byweb',
+            progressId: 'progress-realtime-byweb',
             type: 'realtime'
         },
         realtimeBycate: {
@@ -96,6 +101,7 @@
             chartTitle: '24小时更新趋势 - ' + moment(LAST_DAY).format('YYYY-MM-DD'),
             id: 'realtime-chart-bycate',
             tableId: 'realtime-table-bycate',
+            progressId: 'progress-realtime-bycate',
             type: 'realtime'
         }
     };
@@ -120,6 +126,8 @@
                 type: 'realtime',
                 ftType: 'realtimeByweb'
             });
+
+            this.initEvent();
         },
 
         getData: function(options) {
@@ -154,8 +162,13 @@
             }).done(function(data) {
                 if (data.code == 0) {
                     me.formatData(data.list, ftType);
-                    me.renderChart(ftType);
-                    me.renderTable(ftType);
+                    if (!options.noRenderTable) {
+                        me.renderTable(ftType);
+                    }
+                    
+                    if (!options.noRenderChart) {
+                        me.renderChart(ftType);
+                    }
                 } else {
                     alert('系统错误，请重试');
                 }
@@ -165,6 +178,12 @@
         },
 
         formatData: function(data, type) {
+            if (data.length < 1) {
+                data.push({
+                    updateCount: 0
+                });
+            }
+
             var ftType = formatMap[type],
                 dataList = ftType.data,
                 key = ftType.key,
@@ -176,6 +195,8 @@
                 dateFormatStr = 'HH:mm';
                 eachDateStr = 'timeList';
             }
+
+            chartData[dataList] = {};
 
             $.each(chartData[eachDateStr], function(idx, val) {
                 $.each(data, function(subIdx, subVal) {
@@ -265,8 +286,11 @@
 
             curChartData = $.extend(true, {}, chartOption, curChartData);
 
-            var myChart = echarts.init(document.getElementById(chartType.id), 'macarons'); 
-            myChart.setOption(curChartData);
+            setTimeout(function() {
+                var updateChart = echarts.init(document.getElementById(chartType.id), 'macarons'); 
+                updateChart.setOption(curChartData);
+                $('#' + chartType.progressId).hide();
+            }, 300);
         },
 
         renderTable: function(type) {
@@ -338,6 +362,46 @@
             }
 
             chartData.dateList.reverse();
+        },
+
+        initEvent: function() {
+            var me = this;
+
+            $('#page-content').delegate('.type-filter button', 'click', function(e) {
+                var item = $(e.currentTarget);
+                if (item.hasClass('mdl-button--colored')) {
+                    return;
+                }
+
+                item.parent('.type-filter').find('button').removeClass('mdl-button--colored mdl-button--raised');
+                item.addClass('mdl-button--colored mdl-button--raised');
+
+                var queryPara = {
+                    type: item.data('type'),
+                    ftType: item.data('fttype'),
+                    noRenderTable: true
+                };
+
+                queryPara[item.data('key')] = item.data('value');
+
+                me.getData(queryPara);
+            });
+
+            $('#page-content').delegate('.switch-menu ul li', 'click', function(e) {
+                var item = $(e.currentTarget);
+
+                var queryPara = {
+                    type: item.data('type'),
+                    ftType: item.data('fttype'),
+                    noRenderChart: true
+                };
+
+                item.parents('.switch-menu').find('.cur-choice').text(item.data('value'));
+
+                queryPara[item.data('key')] = item.data('value');
+
+                me.getData(queryPara);
+            });
         }
     };
 

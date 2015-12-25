@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="description" content="update rate">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>手机门户实时更新对比</title>
+  <title><%= title %></title>
   <link rel="stylesheet" href="/css/material.indigo-pink.min.css">
   <link rel="stylesheet" href="/css/material.blue-indigo.min.css" />
   <link rel="stylesheet" href="/css/index.css" />
@@ -32,52 +32,69 @@
     <div class="mdl-layout__drawer">
       <span class="mdl-layout-title">Update Rate</span>
       <nav class="mdl-navigation">
-        <a class="mdl-navigation__link" href="">手机腾讯网</a>
-        <a class="mdl-navigation__link" href="">手机新浪网</a>
-        <a class="mdl-navigation__link" href="">手机搜狐网</a>
-        <a class="mdl-navigation__link" href="">手机网易网</a>
+        <% webNav.forEach(function(val, idx) { %>
+          <a class="mdl-navigation__link" href="<%= val.url %>"><%= val.title %></a>
+        <% }) %>
       </nav>
     </div>
 
     <main class="mdl-layout__content">
-      <div class="page-content">
+      <div class="page-content" id="page-content">
         <div id="updateByWeb" class="chart-wrap">
           <div class="titleTab">
             <div class="type-filter">
-              <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">腾讯</button>
-              <button class="mdl-button mdl-js-button mdl-js-ripple-effect">新浪</button>
-              <button class="mdl-button mdl-js-button mdl-js-ripple-effect">搜狐</button>
-              <button class="mdl-button mdl-js-button mdl-js-ripple-effect">网易</button>
+              <% webArr.forEach(function(val, idx) { %>
+                <% if (idx == 0) { %>
+                  <button data-type="day" data-fttype="byweb" data-value="<%= val %>" data-key="web" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect"><%= val %></button>
+                <% } else { %>
+                  <button data-type="day" data-fttype="byweb" data-value="<%= val %>" data-key="web" class="mdl-button mdl-js-button mdl-js-ripple-effect"><%= val %></button>
+                <% } %>
+              <% }) %>
             </div>
           </div>
 
-          <div id="chart-byweb" class="chart"></div>
+          <div class="chart-show">
+            <div id="progress-byweb" class="update-grogress mdl-progress mdl-js-progress mdl-progress__indeterminate"></div>
+            <div id="chart-byweb" class="chart"></div>
+          </div>
         </div>
 
         <div id="updateByCate" class="chart-wrap">
           <div class="titleTab">
             <div class="type-filter">
-              <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">要闻</button>
-              <button class="mdl-button mdl-js-button mdl-js-ripple-effect">体育</button>
-              <button class="mdl-button mdl-js-button mdl-js-ripple-effect">财经</button>
-              <button class="mdl-button mdl-js-button mdl-js-ripple-effect">娱乐</button>
+              <% cateArr.forEach(function(val, idx) { %>
+                <% if (idx == 0) { %>
+                  <button data-type="day" data-fttype="bycate" data-value="<%= val %>" data-key="category" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect"><%= val %></button>
+                <% } else { %>
+                  <button data-type="day" data-fttype="bycate" data-value="<%= val %>" data-key="category" class="mdl-button mdl-js-button mdl-js-ripple-effect"><%= val %></button>
+                <% } %>
+              <% }) %>
             </div>
           </div>
 
-          <div id="chart-bycate" class="chart"></div>
+          <div class="chart-show">
+            <div id="progress-bycate" class="update-grogress mdl-progress mdl-js-progress mdl-progress__indeterminate"></div>
+            <div id="chart-bycate" class="chart"></div>
+          </div>
         </div>
 
         <div id="realTimeByWeb" class="chart-wrap">
           <div class="titleTab">
             <div class="type-filter">
-              <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">腾讯</button>
-              <button class="mdl-button mdl-js-button mdl-js-ripple-effect">新浪</button>
-              <button class="mdl-button mdl-js-button mdl-js-ripple-effect">搜狐</button>
-              <button class="mdl-button mdl-js-button mdl-js-ripple-effect">网易</button>
+              <% webArr.forEach(function(val, idx) { %>
+                <% if (idx == 0) { %>
+                  <button data-type="realtime" data-fttype="realtimeByweb" data-value="<%= val %>" data-key="web" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect"><%= val %></button>
+                <% } else { %>
+                  <button data-type="realtime" data-fttype="realtimeByweb" data-value="<%= val %>" data-key="web" class="mdl-button mdl-js-button mdl-js-ripple-effect"><%= val %></button>
+                <% } %>
+              <% }) %>
             </div>
           </div>
 
-          <div id="realtime-chart-byweb" class="chart"></div>
+          <div class="chart-show">
+            <div id="progress-realtime-byweb" class="update-grogress mdl-progress mdl-js-progress mdl-progress__indeterminate"></div>
+            <div id="realtime-chart-byweb" class="chart"></div>
+          </div>
         </div>
 
         <div id="updateTable" class="chart-wrap">
@@ -94,12 +111,12 @@
                   <i class="material-icons">more_vert</i>
                 </button>
 
-                <p class="cur-choice">腾讯</p>
+                <p class="cur-choice"><%= webArr[0] %></p>
 
                 <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="menu-lower-left">
-                  <li class="mdl-menu__item">新浪</li>
-                  <li class="mdl-menu__item">搜狐</li>
-                  <li class="mdl-menu__item">网易</li>
+                  <% webArr.forEach(function(val, idx) { %>
+                      <li data-type="day" data-fttype="byweb" data-value="<%= val %>" data-key="web" class="mdl-menu__item"><%= val %></li>
+                  <% }) %>
                 </ul>
               </div>
               <div id="table-byweb"></div>
@@ -111,12 +128,12 @@
                   <i class="material-icons">more_vert</i>
                 </button>
 
-                <p class="cur-choice">要闻</p>
+                <p class="cur-choice"><%= cateArr[0] %></p>
 
                 <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="menu-lower-left2">
-                  <li class="mdl-menu__item">体育</li>
-                  <li class="mdl-menu__item">财经</li>
-                  <li class="mdl-menu__item">娱乐</li>
+                  <% cateArr.forEach(function(val, idx) { %>
+                      <li data-type="day" data-fttype="bycate" data-value="<%= val %>" data-key="category" class="mdl-menu__item"><%= val %></li>
+                  <% }) %>
                 </ul>
               </div>
               <div id="table-bycate"></div>
@@ -129,14 +146,12 @@
                     <i class="material-icons">more_vert</i>
                   </button>
 
-                  <p class="cur-choice">2015-12-22</p>
+                  <p class="cur-choice"><%= lastDay %></p>
 
                   <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="menu-lower-left3">
-                    <li class="mdl-menu__item">2015-12-22</li>
-                    <li class="mdl-menu__item">2015-12-21</li>
-                    <li class="mdl-menu__item">2015-12-20</li>
-                    <li class="mdl-menu__item">2015-12-19</li>
-                    <li class="mdl-menu__item">2015-12-18</li>
+                    <% realtimeDateList.forEach(function(val, idx) { %>
+                      <li data-type="realtime" data-fttype="realtimeByweb" data-value="<%= val %>" data-key="date" class="mdl-menu__item"><%= val %></li>
+                    <% }) %>
                   </ul>
                 </div>
 
@@ -145,12 +160,12 @@
                     <i class="material-icons">more_vert</i>
                   </button>
 
-                  <p class="cur-choice">腾讯</p>
+                  <p class="cur-choice"><%= webArr[0] %></p>
 
                   <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="menu-lower-left4">
-                    <li class="mdl-menu__item">新浪</li>
-                    <li class="mdl-menu__item">搜狐</li>
-                    <li class="mdl-menu__item">网易</li>
+                    <% webArr.forEach(function(val, idx) { %>
+                        <li data-type="realtime" data-fttype="realtimeByweb" data-value="<%= val %>" data-key="web" class="mdl-menu__item"><%= val %></li>
+                    <% }) %>
                   </ul>
                 </div>
               </div>
