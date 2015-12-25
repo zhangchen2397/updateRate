@@ -98,18 +98,18 @@ function dayAnalyze(date) {
     })
 }
 
-//每半小时统计一次
+//每2小时统计一次
 function realTimeAnalyze(date) {
-    for (var i = 0; i < 48; i++) {
-        var curTime = date + ' ' + formatTime(i * 30);
-        var nextTime = moment((+new Date(curTime)) + 30 * 60 * 1000).format('YYYY-MM-DD HH:mm:ss');
+    for (var i = 0; i < 12; i++) {
+        var curTime = date + ' ' + formatTime(i * 2 * 60);
+        var nextTime = moment((+new Date(curTime)) + 2 * 60 * 60 * 1000).format('YYYY-MM-DD HH:mm:ss');
 
-        // console.log(curTime);
-        // console.log(nextTime);
-        // console.log('========================');
+        console.log(curTime);
+        console.log(nextTime);
+        console.log('========================');
 
         var query = [
-            'select count(*) as updateCount, web, category from update_record where ',
+            'select count(1) as updateCount, web, category from update_record where ',
             'unix_timestamp(updateTime) > unix_timestamp(?) and unix_timestamp(updateTime) < unix_timestamp(?) ',
             'group by category, web'
         ].join('');
