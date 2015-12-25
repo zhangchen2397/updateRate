@@ -8,7 +8,7 @@
     var LAST_DAY = +new Date() - 24 * 60 * 60 * 1000;
 
     for (var i = 0; i < GAP; i++) {
-        EMPTY_DATA.push[0];
+        EMPTY_DATA.push(0);
     }
 
     var chartOption = {
@@ -178,12 +178,6 @@
         },
 
         formatData: function(data, type) {
-            if (data.length < 1) {
-                data.push({
-                    updateCount: 0
-                });
-            }
-
             var ftType = formatMap[type],
                 dataList = ftType.data,
                 key = ftType.key,
@@ -399,6 +393,14 @@
                 item.parents('.switch-menu').find('.cur-choice').text(item.data('value'));
 
                 queryPara[item.data('key')] = item.data('value');
+
+                if (item.data('key') == 'date') {
+                    queryPara.web = $('#realtime-web').text();
+                }
+
+                if (item.data('key') == 'web') {
+                    queryPara.date = $('#realtime-date').text();
+                }
 
                 me.getData(queryPara);
             });
