@@ -8,7 +8,7 @@ var WEB_URL_MAP = {
     'sohu': 'http://m.sohu.com/?v=3&amp;_once_=sohu_version_3&amp;_smuid=FvsOWg2jhdCXP9sr2GgLja',
     '163': 'http://3g.163.com/touch'
 };
-var REPORT_URL = 'http://localhost:3000/report/add';
+var REPORT_URL = 'http://123.56.68.68:8080/report/add';
 
 function getQQListData() {
     console.log('open qq web');

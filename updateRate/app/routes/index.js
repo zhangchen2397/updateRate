@@ -11,9 +11,9 @@ router.get('/', function(req, res, next) {
     var CATEGORY_ARR = ['要闻', '财经', '娱乐', '体育'];
 
     function setDateList() {
-        var curDate = lastDayStamp - 60 * 60 * 24 * 1000;
+        var curDate = lastDayStamp;
 
-        for (var i = 0; i < 10; i++) {
+        for (var i = 0; i < 3; i++) {
             realtimeDateList.push(moment(curDate).format('YYYY-MM-DD'));
             curDate -= 60 * 60 * 24 * 1000;
         }

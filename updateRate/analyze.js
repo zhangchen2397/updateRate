@@ -174,4 +174,12 @@ function run(date) {
     });
 }
 
-run();
+
+function dayRun() {
+    setInterval(function() {
+        var date = moment(+new Date() - 24 * 60 * 60 * 1000).format('YYYY-MM-DD');
+        run(date);
+    }, 24 * 60 * 60 * 1000);   
+}
+
+dayRun();
