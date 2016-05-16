@@ -11,7 +11,7 @@ var WEB_URL_MAP = {
 var REPORT_URL = 'http://123.56.68.68:8080/report/add';
 
 function getQQListData() {
-    console.log('open qq web zc');
+    console.log('open qq web');
     page = require( 'webpage' ).create();
 
     page.onConsoleMessage = function(msg) {
