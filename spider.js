@@ -1,3 +1,5 @@
+console.log('def');
+
 //防止在终端乱码
 phantom.outputEncoding = "GBK";
 
